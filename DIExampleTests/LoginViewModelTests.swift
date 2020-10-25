@@ -26,50 +26,34 @@ class LoginViewModelTests: XCTestCase {
     func test_login_failure() throws {
         // Given
         enum DummyError: Error { case error1 }
-        authenticationService.result = .failure(DummyError.error1)
-        var didShowError = false
-        sut.showError = { _ in
-            didShowError = true
+        let expectedError = DummyError.error1
+        authenticationService.result = .failure(expectedError)
+        var errorToTest: DummyError?
+        sut.showError = { error in
+            errorToTest = expectedError
         }
         // When
         sut.login(
             withEmail: "",
-            password: "") { result in
-                // Then
-                switch result {
-                case .failure(let error):
-                    if case DummyError.error1 = error {
-                        XCTAssertTrue(didShowError)
-                    } else {
-                        XCTFail("We have an error. But it's not our error.")
-                    }
-                case .success:
-                    XCTFail("What user? It should fail!")
-                }
-            }
+            password: "")
+        // Then
+        XCTAssertEqual(errorToTest, expectedError)
     }
     
     func test_login_success() {
         // Given
-        let theUser = User(data: "")
-        authenticationService.result = .success(theUser)
-        var didShowMainView = false
-        sut.showMainViewForUser = { _ in
-            didShowMainView = true
+        let expectedUser = User(data: "")
+        authenticationService.result = .success(expectedUser)
+        var userToTest: User?
+        sut.showMainViewForUser = { user in
+            userToTest = user
         }
         // When
         sut.login(
             withEmail: "",
-            password: "") { result in
-                // Then
-                switch result {
-                case .failure:
-                    XCTFail("It shouldn't fail.")
-                case .success(let user):
-                    XCTAssertEqual(user, theUser)
-                    XCTAssertTrue(didShowMainView)
-                }
-            }
+            password: "")
+        // Then
+        XCTAssertEqual(userToTest, expectedUser)
     }
     
     // sut = system under test

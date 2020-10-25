@@ -15,8 +15,7 @@ class LoginViewModel {
     }
     func login(
         withEmail email: String,
-        password: String,
-        completion: @escaping (Result<User, Error>) -> Void
+        password: String
     ) {
         authenticationService.login(
             withEmail: email,
